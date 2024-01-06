@@ -8,9 +8,10 @@ class Graph():
 					for row in range(vertices)]
 		self.visited=[]
 		self.cost=0
-		self.cap=0
+		self.current_capacity=0
 	def printSolution(self, dist):
 		min1=float('inf')
+		val=0
 		for i in range(self.V):
 		   if dist[i]==0:
 		        continue
@@ -50,7 +51,7 @@ dist,capacity=[],[]
 with open('level1a.json') as user_file:
   f= json.load(user_file)
 for v in range(len(f['vehicles'])):
-  max_cap=f['vehicles']['v'+str(v)]['capacity']
+  max_capacity=f['vehicles']['v'+str(v)]['capacity']
   r=[f['restaurants'][f['vehicles']['v'+str(v)]['start_point']]['neighbourhood_distance']]
   for i in range(0,20):
     dist.append(f['neighbourhoods']['n'+str(i)]['distances'])
@@ -67,10 +68,34 @@ g.dijkstra(min1)
 for i in range(1,len(g.graph)-1):
     g.dijkstra(g.visited[-1])
     #print(capacity[g.visited[-1]])
-    g.cap+=capacity[g.visited[-1]]
 g.cost+=r[0][g.visited[-1]]
-print(g.cap)
-#g.cap+=
+g.current_capacity = max_capacity - capacity[min1]
+print(g.current_capacity)
+g.dijkstra(min1)
+
+for i in range(1, len(g.graph)-1):
+    if g.current_capacity == 0:
+        g.visited.append(0)
+        g.cost += r[0][0]
+        g.current_capacity = max_capacity-capacity[0]
+        print(g.visited)
+    print(g.current_capacity)
+    if g.current_capacity <= 0:
+        g.visited.append(0)
+        g.current_capacity = max_capacity-capacity[0]
+        g.cost += r[0][0]
+    g.dijkstra(g.visited[-1])
+    g.current_capacity -= capacity[g.visited[-1]]
+g.cost += r[0][g.visited[-1]]
+print(g.visited)
+for i in range(len(g.visited)):
+    if g.visited[i] == 0:
+        
+        g.visited[i] = "r"+str(g.visited[i])
+    else:
+        g.visited[i] = "n"+str(g.visited[i])
+#output = {'v'+str(v): {"path": ["r0"]+g.visited+["r0"]}}
+print(g.visited,g.current_capacity)
 
 for i in range(len(g.visited)):
     g.visited[i]="n"+str(g.visited[i])
